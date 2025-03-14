@@ -1,62 +1,34 @@
-name: James's Blog CI/CD # 脚本 workflow 名称
+name: James's Blog CI/CD
 
 on:
   push:
-    branches: [main] # 修复：删除重复的 main 分支
-    paths: # 监测所有 source 目录下的文件变动，所有 yml,json 后缀文件的变动。
+    branches: [main]
+    paths:
       - '*.json'
       - '**.yml'
       - '**/source/**'
 
 jobs:
-  blog: # 任务名称
-    timeout-minutes: 30 # 设置 30 分钟超时
-    runs-on: ubuntu-latest # 指定最新 ubuntu 系统
+  deploy:
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js # 修复：添加 uses 字段
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '20'
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Init Node.js # 安装源代码所需插件
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          npm install
-          echo "init node successful"
-
-      - name: Install Hexo-cli # 安装 Hexo
-        run: |
-          npm install -g hexo-cli --save
-          echo "install hexo successful"
-
-      - name: Build Blog # 编译创建静态博客文件
-        run: |
-          hexo clean
-          hexo g
-          echo "build blog successful"
-
-      - name: Deploy James's Blog # 设置 git 信息并推送静态博客文件
-        run: |
-          git config --global user.name "Jpl-hub"
-          git config --global user.email "J7777777772022@outlook.com"
-          hexo deploy
-
-      - name: Confirm Deployment
-        run: echo "Deploy Successful!"
-
-      - name: Deploy James's Blog
-        run: |
-          git config --global user.name "Jpl-hub"
-          git config --global user.email "J7777777772022@outlook.com"
-          git remote set-url origin https://x-access-token:${{ secrets.ACCESS_TOKEN }}@github.com/Jpl-hub/Jpl-hub.github.io.git
+          npm install hexo-cli -g
           hexo deploy
