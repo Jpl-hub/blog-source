@@ -1,39 +1,34 @@
-name: James's Blog CI/CD
+name: Hexo CI/CD
 
 on:
   push:
     branches: [main]
-    paths:
-      - '*.json'
-      - '**.yml'
-      - '**/source/**'
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: 检出源码
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
+      - name: 设置 Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: 安装依赖
+        run: npm install
 
-      - name: Build
+      - name: 生成静态文件
         run: npm run build
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "Jpl-hub"
-          git config --global user.email "J7777777772022@outlook.com"
-
-      - name: Deploy
+      - name: 部署到 GitHub Pages
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          PUBLISH_REPOSITORY: Jpl-hub/Jpl-hub.github.io
+          PUBLISH_BRANCH: main
+          PUBLISH_DIR: ./public
         run: |
-          npm install hexo-cli -g
-          hexo deploy
+          npm install hexo-deployer-git --save
+          npx hexo-deployer-git --repo https://x-access-token:${{ secrets.ACCESS_TOKEN }}@github.com/Jpl-hub/Jpl-hub.github.io.git --branch main --dir ./public
