@@ -26,6 +26,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "Jpl-hub"
+          git config --global user.email "J7777777772022@outlook.com"
+
       - name: Deploy
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
