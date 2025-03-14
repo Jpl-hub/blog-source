@@ -53,3 +53,10 @@ jobs:
 
       - name: Confirm Deployment
         run: echo "Deploy Successful!"
+
+      - name: Deploy James's Blog
+        run: |
+          git config --global user.name "Jpl-hub"
+          git config --global user.email "J7777777772022@outlook.com"
+          git remote set-url origin https://x-access-token:${{ secrets.ACCESS_TOKEN }}@github.com/Jpl-hub/Jpl-hub.github.io.git
+          hexo deploy
