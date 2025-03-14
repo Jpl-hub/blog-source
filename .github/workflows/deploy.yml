@@ -1,35 +1,53 @@
-name: Hexo CI/CD
+name: Deploy Hexo to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main  # 触发部署的分支（源码仓库的分支）
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 检出源码
-        uses: actions/checkout@v2
-
-      - name: 设置 Node.js
-        uses: actions/setup-node@v2
+      # 1. 检出源码仓库代码
+      - name: Checkout source code
+        uses: actions/checkout@v4
         with:
-          node-version: '20'
+          submodules: recursive  # 如果使用 Git 子模块（如主题）
 
-      - name: 安装 Hexo CLI
-        run: npm install -g hexo-cli
-        
-      - name: 安装项目依赖
-        run: npm install
+      # 2. 设置 Node.js 环境
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-      - name: 生成静态文件
-        run: hexo generate
+      # 3. 缓存 node_modules 加速构建
+      - name: Cache NPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache-
 
-      - name: 部署到 GitHub Pages
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      # 4. 安装 Hexo 和依赖
+      - name: Install Dependencies
         run: |
-          git config --global user.name "Jpl-hub"
-          git config --global user.email "J7777777772022@outlook.com"
-          npx hexo deploy
+          npm install
+          npm install hexo-cli -g
+
+      # 5. 生成静态文件（Hexo 核心步骤）
+      - name: Generate Static Files
+        run: |
+          hexo clean
+          hexo generate
+
+      # 6. 部署到 GitHub Pages 仓库
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3  # 专为 GitHub Pages 优化的部署 Action
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # 自动生成的 Token（需赋予 repo 权限）
+          publish_dir: ./public  # Hexo 生成的静态文件目录
+          publish_branch: main    # 目标仓库的分支（GitHub Pages 要求分支名）
+          external_repository: Jpl-hub/Jpl-hub.github.io  # 你的 Pages 仓库名
+          keep_files: false       # 强制覆盖旧文件
