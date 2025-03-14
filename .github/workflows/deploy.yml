@@ -18,10 +18,8 @@ jobs:
           node-version: '20'
 
       - name: 安装 Hexo CLI
-        run: |
-          npm install -g hexo-cli
-          sudo chmod +x /usr/local/bin/hexo
-
+        run: npm install -g hexo-cli
+        
       - name: 安装项目依赖
         run: npm install
 
