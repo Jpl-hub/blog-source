@@ -17,18 +17,21 @@ jobs:
         with:
           node-version: '20'
 
-      - name: 安装依赖
+      - name: 安装 Hexo CLI
+        run: |
+          npm install -g hexo-cli
+          sudo chmod +x /usr/local/bin/hexo
+
+      - name: 安装项目依赖
         run: npm install
 
       - name: 生成静态文件
-        run: npm run build
+        run: hexo generate
 
       - name: 部署到 GitHub Pages
         env:
-          PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          PUBLISH_REPOSITORY: Jpl-hub/Jpl-hub.github.io
-          PUBLISH_BRANCH: main
-          PUBLISH_DIR: ./public
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          npm install hexo-deployer-git --save
-          npx hexo-deployer-git --repo https://x-access-token:${{ secrets.ACCESS_TOKEN }}@github.com/Jpl-hub/Jpl-hub.github.io.git --branch main --dir ./public
+          git config --global user.name "Jpl-hub"
+          git config --global user.email "J7777777772022@outlook.com"
+          npx hexo deploy
