@@ -46,7 +46,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3  # 专为 GitHub Pages 优化的部署 Action
         with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}  # 自动生成的 Token（需赋予 repo 权限）
+          github_token: ${{ secrets.GITHUB_TOKEN }} # 自动生成的 Token（需赋予 repo 权限）
           publish_dir: ./public  # Hexo 生成的静态文件目录
           publish_branch: main    # 目标仓库的分支（GitHub Pages 要求分支名）
           external_repository: Jpl-hub/Jpl-hub.github.io  # 你的 Pages 仓库名
