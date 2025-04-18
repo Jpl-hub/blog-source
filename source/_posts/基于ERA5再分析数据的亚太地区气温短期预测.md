@@ -1,5 +1,7 @@
 ---
 title: 基于ERA5再分析数据的亚太地区气温短期预测研究报告
+tags: [Climate, Temperature, Prediction]
+categories: [Mechine Learning]
 ---
 
 ## 一、研究背景与动机
